@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "postgres",
+  "repo": "postgres-stack-module",
+  "runtimeId": "postgres",
+  "lifecycle": "active",
+  "dependencies": [
+    "stack-foundation"
+  ],
+  "overlays": [
+    "stack.compose/postgres.yml",
+    "stack.config/postgres",
+    "stack.config/postgres/create-observer-views.sql",
+    "stack.config/postgres/ensure-keycloak-db.sh",
+    "stack.config/postgres/ensure-matrix-authentication-service-db.sh",
+    "stack.config/postgres/ensure-users.sh",
+    "stack.config/postgres/init-db.sh",
+    "stack.config/postgres/reset-admin-password.sh"
+  ]
+}
