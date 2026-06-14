@@ -9,7 +9,6 @@
   ],
   "overlays": [
     "stack.compose/postgres.yml",
-    "stack.config/postgres",
     "stack.config/postgres/create-observer-views.sql",
     "stack.config/postgres/ensure-keycloak-db.sh",
     "stack.config/postgres/ensure-matrix-authentication-service-db.sh",
