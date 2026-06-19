@@ -7,6 +7,14 @@
   "dependencies": [
     "stack-foundation"
   ],
+  "runtimeDependencies": [
+    "stack-foundation"
+  ],
+  "contracts": [
+    "module-contract"
+  ],
+  "smoke": "external-only",
+  "smokeUnsupportedReason": "requires generated bundle context, deployed networking, secrets, or service dependencies",
   "overlays": [
     "stack.compose/postgres.yml",
     "stack.config/postgres/create-observer-views.sql",
@@ -15,5 +23,6 @@
     "stack.config/postgres/ensure-users.sh",
     "stack.config/postgres/init-db.sh",
     "stack.config/postgres/reset-admin-password.sh"
-  ]
+  ],
+  "testAssets": []
 }
