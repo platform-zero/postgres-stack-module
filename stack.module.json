@@ -22,7 +22,8 @@
     "stack.config/postgres/ensure-matrix-authentication-service-db.sh",
     "stack.config/postgres/ensure-users.sh",
     "stack.config/postgres/init-db.sh",
-    "stack.config/postgres/reset-admin-password.sh"
+    "stack.config/postgres/reset-admin-password.sh",
+    "stack.kotlin/test-runner/src/main/kotlin/org/webservices/testrunner/suites/PostgresDatabaseTests.kt"
   ],
   "testAssets": []
 }
