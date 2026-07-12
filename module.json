@@ -1,0 +1,45 @@
+{
+  "configuration": {
+    "schema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    }
+  },
+  "id": "postgres",
+  "overlays": [
+    "stack.compose/postgres.yml",
+    "stack.config/postgres/create-observer-views.sql",
+    "stack.config/postgres/ensure-keycloak-db.sh",
+    "stack.config/postgres/ensure-matrix-authentication-service-db.sh",
+    "stack.config/postgres/ensure-users.sh",
+    "stack.config/postgres/init-db.sh",
+    "stack.config/postgres/reset-admin-password.sh",
+    "stack.kotlin/test-runner/src/main/kotlin/org/webservices/testrunner/suites/PostgresDatabaseTests.kt"
+  ],
+  "provides": [
+    {
+      "capability": "module:postgres",
+      "version": "1"
+    }
+  ],
+  "requires": [
+    {
+      "capability": "module:stack-foundation",
+      "version": "1"
+    }
+  ],
+  "schemaVersion": 1,
+  "services": [
+    {
+      "name": "postgres",
+      "routes": [],
+      "volumes": []
+    }
+  ],
+  "verification": {
+    "commands": [
+      "test -f stack.module.json && test -f module.json"
+    ]
+  }
+}
