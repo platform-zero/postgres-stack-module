@@ -1,0 +1,48 @@
+---
+schemaVersion: 1
+module: "postgres"
+target: "core"
+services:
+  postgres:
+    image: "timescale/timescaledb@sha256:0af03ecf697825f6ddae76fd275d16bf46007bed6d00eb3d754779cb7db96fa6"
+    containerName: "postgres"
+    lifecycle: "daemon"
+    updatePolicy: "pinned"
+    placement: "rootful"
+    environment:
+      POSTGRES_USER: "${POSTGRES_ADMIN_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_ADMIN_PASSWORD}"
+      POSTGRES_DB: "postgres"
+      POSTGRES_GRAFANA_PASSWORD: "${POSTGRES_GRAFANA_PASSWORD}"
+      POSTGRES_KEYCLOAK_PASSWORD: "${POSTGRES_KEYCLOAK_PASSWORD:-}"
+      POSTGRES_PLANKA_PASSWORD: "${POSTGRES_PLANKA_PASSWORD}"
+      POSTGRES_SYNAPSE_PASSWORD: "${POSTGRES_SYNAPSE_PASSWORD}"
+      POSTGRES_MATRIX_AUTHENTICATION_SERVICE_PASSWORD: "${POSTGRES_MATRIX_AUTHENTICATION_SERVICE_PASSWORD}"
+      POSTGRES_VAULTWARDEN_PASSWORD: "${POSTGRES_VAULTWARDEN_PASSWORD}"
+      POSTGRES_HOMEASSISTANT_PASSWORD: "${POSTGRES_HOMEASSISTANT_PASSWORD}"
+      POSTGRES_AGENT_PASSWORD: "${POSTGRES_AGENT_PASSWORD}"
+      POSTGRES_TXGATEWAY_USER: "${POSTGRES_TXGATEWAY_USER:-txgateway}"
+      POSTGRES_TXGATEWAY_PASSWORD: "${POSTGRES_TXGATEWAY_PASSWORD}"
+    networks:
+    - "postgres"
+    volumes:
+    - "postgres_data:/var/lib/postgresql/data"
+    - "./configs/postgres/init-db.sh:/docker-entrypoint-initdb.d/01-init-db.sh:ro"
+    health:
+      test:
+      - "CMD-SHELL"
+      - "pg_isready -U ${POSTGRES_ADMIN_USER} -t 1 && \\\npsql -U ${POSTGRES_ADMIN_USER}\
+        \ -d postgres -t -c 'SELECT 1' > /dev/null\n"
+      interval: "5s"
+      timeout: "5s"
+      retries: 24
+      start_period: "20s"
+    command: "postgres -c 'max_connections=300' -c 'shared_buffers=1GB' -c 'max_worker_processes=48'\
+      \ -c 'max_parallel_workers=8' -c 'timescaledb.max_background_workers=16'"
+    restart: "unless-stopped"
+    resources:
+      limits:
+        memory: "8G"
+        cpus: "2.0"
+networks: {}
+volumes: {}

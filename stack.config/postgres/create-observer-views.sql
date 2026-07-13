@@ -6,7 +6,7 @@
 -- This file targets the main postgres cluster (grafana, planka).
 -- Forgejo and Mastodon now live on postgres-ssd and have their own observer script.
 -- Run this manually after the stack is fully initialized:
---   docker exec -i postgres psql -U <admin> -d <database> < create-observer-views.sql
+--   podman exec -i postgres psql -U <admin> -d <database> < create-observer-views.sql
 
 -- =============================================================================
 -- GRAFANA DATABASE - Public metadata only
