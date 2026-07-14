@@ -11,7 +11,7 @@ POSTGRES_HOMEASSISTANT_PASSWORD="${POSTGRES_HOMEASSISTANT_PASSWORD:-}"
 POSTGRES_AGENT_PASSWORD="${POSTGRES_AGENT_PASSWORD:?ERROR: POSTGRES_AGENT_PASSWORD not set}"
 POSTGRES_TXGATEWAY_USER="${POSTGRES_TXGATEWAY_USER:-txgateway}"
 POSTGRES_TXGATEWAY_PASSWORD="${POSTGRES_TXGATEWAY_PASSWORD:?ERROR: POSTGRES_TXGATEWAY_PASSWORD not set}"
-# PGPASSWORD already set by docker-compose environment
+# PGPASSWORD already set by the generated runtime environment
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
     -- Create users with passwords from environment (must be created before databases for ownership)
     -- Use DO block to check if user exists before creating
