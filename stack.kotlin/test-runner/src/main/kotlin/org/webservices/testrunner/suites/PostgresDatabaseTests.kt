@@ -46,7 +46,7 @@ test("Postgres transaction commits successfully") {
                     stmt.executeQuery("SELECT COUNT(*) FROM pg_stat_activity").use { rs ->
                         rs.next()
                         val count = rs.getInt(1)
-                        require(count >= 0) { "Activity count should be non-negative" }
+                        require(count > 0) { "pg_stat_activity must include the current test connection" }
                     }
                 }
                 return (System.nanoTime() - start) / 1_000_000
@@ -116,21 +116,15 @@ test("Postgres transaction commits successfully") {
         }
     }
 
-    test("Postgres can query system tables") {
+    test("Postgres reports the configured database and schema") {
         val dbConfig = env.endpoints.postgres
         DriverManager.getConnection(dbConfig.jdbcUrl, dbConfig.user, dbConfig.password).use { conn ->
             conn.createStatement().use { stmt ->
-                val rs = stmt.executeQuery("""
-                    SELECT schemaname, tablename
-                    FROM pg_tables
-                    WHERE schemaname = 'public'
-                    LIMIT 5
-                """)
-                var count = 0
-                while (rs.next()) {
-                    count++
+                stmt.executeQuery("SELECT current_database(), current_schema()").use { rs ->
+                    require(rs.next()) { "Postgres did not return its current database and schema" }
+                    require(rs.getString(1).isNotBlank()) { "Postgres current_database() was blank" }
+                    require(rs.getString(2).isNotBlank()) { "Postgres current_schema() was blank" }
                 }
-                require(count >= 0) { "Table count should be non-negative" }
             }
         }
     }
