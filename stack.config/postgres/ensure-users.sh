@@ -8,27 +8,21 @@ echo "PostgreSQL is ready. Ensuring users and databases..."
 POSTGRES_PLANKA_PASSWORD="${POSTGRES_PLANKA_PASSWORD:?ERROR: POSTGRES_PLANKA_PASSWORD not set}"
 POSTGRES_SYNAPSE_PASSWORD="${POSTGRES_SYNAPSE_PASSWORD:?ERROR: POSTGRES_SYNAPSE_PASSWORD not set}"
 MARIADB_BOOKSTACK_PASSWORD="${MARIADB_BOOKSTACK_PASSWORD:?ERROR: MARIADB_BOOKSTACK_PASSWORD not set}"
-psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
+psql -v ON_ERROR_STOP=1 \
+    -v POSTGRES_PLANKA_PASSWORD="$POSTGRES_PLANKA_PASSWORD" \
+    -v POSTGRES_SYNAPSE_PASSWORD="$POSTGRES_SYNAPSE_PASSWORD" \
+    -v MARIADB_BOOKSTACK_PASSWORD="$MARIADB_BOOKSTACK_PASSWORD" \
+    --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-'EOSQL'
     -- Create or update users with passwords
-    DO \$\$
-    BEGIN
-        IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'planka') THEN
-            CREATE USER planka WITH PASSWORD '$POSTGRES_PLANKA_PASSWORD';
-        ELSE
-            ALTER USER planka WITH PASSWORD '$POSTGRES_PLANKA_PASSWORD';
-        END IF;
-        IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'synapse') THEN
-            CREATE USER synapse WITH PASSWORD '$POSTGRES_SYNAPSE_PASSWORD';
-        ELSE
-            ALTER USER synapse WITH PASSWORD '$POSTGRES_SYNAPSE_PASSWORD';
-        END IF;
-        IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'bookstack') THEN
-            CREATE USER bookstack WITH PASSWORD '$MARIADB_BOOKSTACK_PASSWORD';
-        ELSE
-            ALTER USER bookstack WITH PASSWORD '$MARIADB_BOOKSTACK_PASSWORD';
-        END IF;
-    END
-    \$\$;
+    SELECT format('CREATE USER planka WITH PASSWORD %L', :'POSTGRES_PLANKA_PASSWORD')
+    WHERE NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'planka')\gexec
+    SELECT format('ALTER USER planka WITH PASSWORD %L', :'POSTGRES_PLANKA_PASSWORD')\gexec
+    SELECT format('CREATE USER synapse WITH PASSWORD %L', :'POSTGRES_SYNAPSE_PASSWORD')
+    WHERE NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'synapse')\gexec
+    SELECT format('ALTER USER synapse WITH PASSWORD %L', :'POSTGRES_SYNAPSE_PASSWORD')\gexec
+    SELECT format('CREATE USER bookstack WITH PASSWORD %L', :'MARIADB_BOOKSTACK_PASSWORD')
+    WHERE NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'bookstack')\gexec
+    SELECT format('ALTER USER bookstack WITH PASSWORD %L', :'MARIADB_BOOKSTACK_PASSWORD')\gexec
     -- Create databases if they don't exist
     SELECT 'CREATE DATABASE planka OWNER planka'
     WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'planka')\gexec
